@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>NumPuzzle</title>
+    <link rel="stylesheet" href="/css/inicio.css">
+    <link rel="shortcut icon" href="/images/rompecabezas.png" type="image/x-icon">
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+
+
+    <style>
+        /* Estilos para el botón flotante de música */
+        .floating-music-button {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            width: 60px;
+            height: 60px;
+            background-color: rgba(0, 0, 0, 0.75); /* Fondo oscuro */
+            border-radius: 50%; /* Forma circular */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3); /* Sombra */
+            transition: transform 0.3s, background-color 0.3s;
+            z-index: 9999;
+        }
+
+        .floating-music-button:hover {
+            background-color: rgba(0, 0, 0, 0.9); /* Fondo más oscuro al pasar el mouse */
+            transform: scale(1.1); /* Aumenta el tamaño al pasar el mouse */
+        }
+
+        .floating-music-button i {
+            font-size: 30px; /* Tamaño del icono */
+            transition: color 0.3s; /* Transición suave para el color del icono */
+        }
+    </style>
+</head>
+<body>
+<audio id="background-music" preload="auto" loop muted>
+    <source src="/audio/puzzle-game.mp3" type="audio/mpeg">
+</audio>
+
+<div class="floating-music-button" id="music-toggle">
+    <i class='bx bxs-music' id="music-icon" style='color:#b4b4b4'></i>
+</div>
+
+<div class="wrapper__option__puzzle">
+    <div class="content__form">
+        <div class="infomation__sesion">
+            <div class="status__player">
+                <div class="status" th:classappend="${player != null and player.name != null and !#strings.isEmpty(player.name)} ? 'active' : 'inactive'"></div>
+                <span th:text="${player != null and player.name != null and !#strings.isEmpty(player.name)} ? 'Activo' : 'Inactivo'"></span>
+            </div>
+
+            <a th:if="${player.name}" href="/logout">
+                <i class='bx bxs-exit'></i>
+            </a>
+        </div>
+
+        <form th:action="@{/comenzar}" th:object="${player}" method="post">
+            <div th:unless="${player.name}" class="column">
+                <div class="icon">
+                    <img src="/images/rompecabezas.png" alt="Kemapuzz" srcset="/images/rompecabezas.png">
+                    <h1>Kemapuzz</h1>
+                </div>
+
+                <div class="content__input">
+                    <input type="text" id="name" name="name" th:field="*{name}" placeholder="Nick" required />
+                    <select id="tamanio" name="tamanio" th:field="*{tamanio}">
+                        <option value="3">3x3</option>
+                        <option value="5">5x5</option>
+                        <option value="7">7x7</option>
+                    </select>
+                </div>
+            </div>
+
+            <div th:if="${player.name}" class="column">
+                <div class="icon">
+                    <img src="/images/rompecabezas.png" alt="Kemapuzz" srcset="/images/rompecabezas.png">
+                    <h1>Kemapuzz</h1>
+                </div>
+
+                <div class="content__input">
+                    <span class="photo__ini" id="photoIni"></span>
+                    <input type="text" name="name" th:field="*{name}" th:value="*{name}" placeholder="Nick" readonly required />
+                    <select id="tamanio" name="tamanio" th:field="*{tamanio}">
+                        <option value="3">3x3</option>
+                        <option value="5">5x5</option>
+                        <option value="7">7x7</option>
+                    </select>
+                </div>
+            </div>
+
+            <button type="submit">¡Jugar!</button>
+        </form>
+    </div>
+
+    <div class="content__rating">
+        <div class="size-selection">
+            <button onclick="filtrarPorTamanio(3)">3x3</button>
+            <button onclick="filtrarPorTamanio(5)">5x5</button>
+            <button onclick="filtrarPorTamanio(7)">7x7</button>
+        </div>
+        <div class="table__rating">
+            <table>
+                <thead>
+                <tr>
+                    <th>Puesto</th>
+                    <th>Nombre</th>
+                    <!--<th>Tamaño</th>-->
+                    <th>Tiempo</th>
+                </tr>
+                </thead>
+                <tbody id="ranking__body">
+                <tr th:each="rating, iterStat : ${ratings}">
+                    <td th:text="${iterStat.index + 1}"></td>
+                    <td th:text="${rating.player.name}"></td>
+                    <!--<td th:text="${rating.player.tamanio + 'x' + rating.player.tamanio}"></td>-->
+                    <td class="time" th:text="${rating.time}"></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+</div>
+
+<div class="history">
+    <h2>Historial de Intentos</h2>
+    <div class="table__history">
+        <table>
+            <thead>
+            <tr>
+                <th>#</th>
+                <th>Nombre</th>
+                <th>Tamaño</th>
+                <th>Tiempo</th>
+                <!--<th>Fecha</th> -->
+            </tr>
+            </thead>
+            <tbody id="historial__body">
+            <tr th:each="rating, iterStat : ${historial}">
+                <td th:text="${iterStat.index + 1}"></td>
+                <td th:text="${rating.player.name}"></td>
+                <td th:text="${rating.player.tamanio + 'x' + rating.player.tamanio}"></td>
+                <td class="time" th:text="${rating.time}"></td>
+                <!--<td th:text="${#dates.format(rating.date, 'dd/MM/yyyy')}"></td>-->
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+
+<script>
+    const audio = document.getElementById('background-music');
+    const icon = document.getElementById('music-icon');
+    const musicToggle = document.getElementById('music-toggle');
+    let hasInteracted = false;
+    let audioLoaded = false;
+
+    // Detecta cuando el audio está completamente cargado
+    audio.addEventListener('canplaythrough', () => {
+        audioLoaded = true; // Marca que el audio está listo para reproducirse
+    });
+
+    // Función para alternar el estado de la música
+    musicToggle.addEventListener('click', () => {
+        if (!hasInteracted) {
+            audio.muted = false; // Desactiva el mute en la primera interacción
+            hasInteracted = true;
+        }
+
+        if (audioLoaded) { // Solo reproduce si el audio ya está cargado
+            if (audio.paused) {
+                audio.play();
+                icon.style.color = '#2bf41d'; // Verde cuando está activo
+            } else {
+                audio.pause();
+                icon.style.color = '#b4b4b4'; // Gris cuando está inactivo
+            }
+        } else {
+            console.log("El audio aún se está cargando, intenta nuevamente en un momento.");
+        }
+    });
+</script>
+
+
+<script>
+    // Script para mostrar el tiempo en formato HH:mm:ss
+    function formatTime(seconds) {
+        const hours = Math.floor(seconds / 3600);
+        const minutes = Math.floor((seconds % 3600) / 60);
+        const secs = seconds % 60;
+        return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+    }
+
+    // Función para formatear todas las celdas de tiempo
+    function formatAllTimes() {
+        document.querySelectorAll('.content__rating .time').forEach(cell => {
+            const seconds = parseInt(cell.textContent);
+            cell.textContent = formatTime(seconds);
+        });
+    }
+
+    // Función para formatear todas las celdas de tiempo
+    function formatAllTimesHis() {
+        document.querySelectorAll('.table__history .time').forEach(cell => {
+            const seconds = parseInt(cell.textContent);
+            cell.textContent = formatTime(seconds);
+        });
+    }
+
+    // Función para filtrar los rankings por tamaño y actualizar la tabla
+    async function filtrarPorTamanio(tamanio) {
+        const response = await fetch(`/rankingPorTamanio?tamanio=${tamanio}`);
+        const html = await response.text();
+
+        document.getElementById("ranking__body").innerHTML = html;
+
+        formatAllTimes();
+    }
+
+    document.addEventListener('DOMContentLoaded', formatAllTimes);
+    document.addEventListener("DOMContentLoaded", formatAllTimesHis);
+</script>
+
+
+<script>
+    // Script para iniciales del nombre
+    function updateInitial() {
+        const nameInput = document.querySelector('input[name="name"]');
+        const photoIniSpan = document.getElementById('photoIni');
+
+        if (nameInput && nameInput.value) {
+            photoIniSpan.textContent = nameInput.value.charAt(0).toUpperCase();
+        } else {
+            photoIniSpan.textContent = '?';
+        }
+    }
+
+    updateInitial();
+</script>
+
+
+
+<script>
+    // Crear piezas de rompecabezas aleatorias
+    function crearPiezasDeRompecabezas(num) {
+        const body = document.body;
+        for (let i = 0; i < num; i++) {
+            const pieza = document.createElement('div');
+            pieza.classList.add('puzzle-piece');
+            pieza.style.top = `${Math.random() * 100}vh`;
+            pieza.style.left = `${Math.random() * 100}vw`;
+            body.appendChild(pieza);
+        }
+    }
+
+    crearPiezasDeRompecabezas(30);
+</script>
+
+</body>
+</html>

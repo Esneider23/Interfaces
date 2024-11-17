@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Rompecabezas</title>
+    <link rel="stylesheet" href="/css/juego.css">
+    <link rel="shortcut icon" href="/images/rompecabezas.png" type="image/x-icon">
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <link rel="stylesheet" href="/css/inicio.css">
+    <style>
+        #puzzle {
+            display: grid;
+            gap: 5px;
+            border: 4px solid rgba(255, 255, 255, 0.8);
+            border-radius: 10px;
+            padding: 5px;
+            background-color: rgba(255, 255, 255, 0.1);
+            width: 100%;
+            max-height: 300px;
+        }
+        .piece {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: rgba(98, 117, 251, 0.94);
+            border: 2px solid #6275fb;
+            border-radius: 5px;
+            font-size: 32px;
+            color: #ffffff;
+            transition: transform 0.2s ease, background-color 0.2s ease;
+            cursor: pointer;
+            width: 100%;
+            height: 100%;
+        }
+        .empty {
+            background-color: transparent;
+        }
+
+        .modal {
+            display: none; /* Ocultar por defecto */
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            z-index: 1000;
+        }
+
+        .modal-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .btn-confirm, .btn-cancel {
+            margin: 10px;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .btn-confirm {
+            background-color: #d9534f; /* Color para confirmar */
+            color: #fff;
+        }
+
+        .btn-cancel {
+            background-color: #5bc0de; /* Color para cancelar */
+            color: #fff;
+        }
+
+    </style>
+</head>
+<body>
+<div class="wrapper__option__puzzle">
+    <div class="content__infor">
+        <div class="status__player">
+            <div class="status" th:classappend="${player != null and player.name != null and !#strings.isEmpty(player.name)} ? 'active' : 'inactive'"></div>
+            <span th:text="${player != null and player.name != null and !#strings.isEmpty(player.name)} ? 'Activo' : 'Inactivo'"></span>
+        </div>
+        <div class="icon">
+            <img src="/images/rompecabezas.png" alt="Kemapuzz" srcset="/images/rompecabezas.png">
+            <h1>Kemapuzz</h1>
+        </div>
+
+        <div class="infomation__player">
+            <div>
+                <i class='bx bxs-user'></i>
+                <span th:text="${player.name}"></span>
+            </div>
+
+            <div>
+                <i class='bx bxs-hot' ></i>
+                <span class="time" th:text="${player.bestTime}"></span>
+            </div>
+
+            <div class="time__live">
+                <i class='bx bxs-timer' ></i>
+                <span id="tiempo">00:00:00</span>
+            </div>
+
+        </div>
+        <!-- Contenedor del modal de confirmación -->
+        <div id="modalConfirmacion" class="modal">
+            <div class="modal-content">
+                <p>¿Estás seguro de que quieres rendirte?</p>
+                <button id="confirmarSalida" class="btn-confirm">Sí</button>
+                <button id="cancelarSalida" class="btn-cancel">No</button>
+            </div>
+        </div>
+
+        <a href="javascript:void(0)" class="leave__btn" id="botonRendirse">Me rindo<i class='bx bxs-sad'></i></a>
+
+    </div>
+
+    <div class="container__puzzle">
+        <div id="puzzle" th:attr="data-tamanio=${tamanio}">
+
+        </div>
+
+        <img th:src="@{/images/{imagen}(imagen=${imagen})}" alt="Imagen del Rompecabezas" id="imagenRompecabezas" style="display: none"/>
+    </div>
+
+</div>
+
+<script>
+    document.getElementById('botonRendirse').addEventListener('click', function() {
+        document.getElementById('modalConfirmacion').style.display = 'block';
+    });
+
+    document.getElementById('confirmarSalida').addEventListener('click', function() {
+        window.location.href = '/'; // Redirige al usuario a la página de inicio
+    });
+
+    document.getElementById('cancelarSalida').addEventListener('click', function() {
+        document.getElementById('modalConfirmacion').style.display = 'none';
+    });
+
+</script>
+
+<script>
+    // Crear piezas de rompecabezas aleatorias
+    function crearPiezasDeRompecabezas(num) {
+        const body = document.body;
+        for (let i = 0; i < num; i++) {
+            const pieza = document.createElement('div');
+            pieza.classList.add('puzzle-piece');
+            pieza.style.top = `${Math.random() * 100}vh`;
+            pieza.style.left = `${Math.random() * 100}vw`;
+            body.appendChild(pieza);
+        }
+    }
+
+    crearPiezasDeRompecabezas(30);
+</script>
+
+<script>
+    // Script para mostrar el tiempo en formato HH:mm:ss
+    function formatTime(seconds) {
+        if (seconds === 2147483647) {
+            return '00:00:00';
+        }
+        const hours = Math.floor(seconds / 3600);
+        const minutes = Math.floor((seconds % 3600) / 60);
+        const secs = seconds % 60;
+        return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+    }
+
+    document.querySelectorAll('.time').forEach(cell => {
+        const seconds = parseInt(cell.textContent);
+        cell.textContent = formatTime(seconds);
+    });
+
+
+</script>
+
+<script>
+    let piezas = [];
+    let puzzleContainer = document.getElementById('puzzle');
+    let imagenRompecabezas = document.getElementById('imagenRompecabezas');
+    let startTime;
+    let timerInterval;
+
+    function generarPuzzle(size) {
+        puzzleContainer.innerHTML = '';
+        puzzleContainer.style.gridTemplateColumns = `repeat(${size}, 1fr)`;
+        puzzleContainer.style.gridTemplateRows = `repeat(${size}, 1fr)`;
+
+        // Crear una lista con las piezas en orden
+        let numbers = [];
+        for (let i = 0; i < size * size - 1; i++) {
+            numbers.push(i + 1);
+        }
+        numbers.push('');
+
+        // Crear una mezcla resoluble
+        let shuffledNumbers = getSolvableShuffle(numbers, size);
+
+        // Crear las piezas en el DOM
+        for (let i = 0; i < shuffledNumbers.length; i++) {
+            let piece = document.createElement('div');
+            piece.classList.add('piece');
+            piece.textContent = shuffledNumbers[i];
+            if (shuffledNumbers[i] === '') {
+                // Poner clase vacía a la pieza vacía
+                piece.classList.add('empty');
+            }
+            piece.style.backgroundImage = `url(${imagenRompecabezas.src})`;
+            piece.style.backgroundSize = `${100 / size}% ${100 / size}%`;
+            piece.style.backgroundPosition = `${(i % size) * (100 / size)}% ${(Math.floor(i / size)) * (100 / size)}%`;
+            piece.addEventListener('click', moverPieza);
+            puzzleContainer.appendChild(piece);
+            piezas.push(piece);
+        }
+
+        startTime = Date.now();
+        iniciarTemporizador();
+    }
+
+    function getSolvableShuffle(numbers, size) {
+        let isSolvable = false;
+        let shuffled;
+
+        while (!isSolvable) {
+            shuffled = shuffleArray(numbers.slice(0, -1)).concat('');
+            isSolvable = checkSolvable(shuffled, size);
+        }
+
+        return shuffled;
+    }
+
+    function checkSolvable(numbers, size) {
+        let inversions = 0;
+        for (let i = 0; i < numbers.length - 1; i++) {
+            if (numbers[i] !== '') {
+                for (let j = i + 1; j < numbers.length; j++) {
+                    if (numbers[j] !== '' && numbers[i] > numbers[j]) {
+                        inversions++;
+                    }
+                }
+            }
+        }
+        if (size % 2 === 0) {
+            let blankRow = Math.floor(numbers.indexOf('') / size);
+            return (inversions + blankRow) % 2 === 0;
+        } else {
+            return inversions % 2 === 0;
+        }
+    }
+
+    function iniciarTemporizador() {
+        timerInterval = setInterval(() => {
+            let tiempoTranscurrido = Math.round((Date.now() - startTime) / 1000);
+
+            // Convertir tiempo a horas, minutos y segundos
+            const horas = Math.floor(tiempoTranscurrido / 3600);
+            const minutos = Math.floor((tiempoTranscurrido % 3600) / 60);
+            const segundos = tiempoTranscurrido % 60;
+
+            // Formatear el tiempo como HH:mm:ss
+            const tiempoFormateado =
+                String(horas).padStart(2, '0') + ':' +
+                String(minutos).padStart(2, '0') + ':' +
+                String(segundos).padStart(2, '0');
+
+            document.getElementById('tiempo').textContent = tiempoFormateado;
+        }, 1000);
+    }
+
+
+    function shuffleArray(array) {
+        for (let i = array.length - 1; i > 0; i--) {
+            let j = Math.floor(Math.random() * (i + 1));
+            [array[i], array[j]] = [array[j], array[i]];
+        }
+        return array;
+    }
+
+    function moverPieza(e) {
+        let clickedPiece = e.target;
+        let emptyPiece = document.querySelector('.empty');
+
+        let clickedIndex = piezas.indexOf(clickedPiece);
+        let emptyIndex = piezas.indexOf(emptyPiece);
+
+        if (esAdyacente(clickedIndex, emptyIndex, Math.sqrt(piezas.length))) {
+            intercambiarPiezas(clickedPiece, emptyPiece);
+            if (puzzleCompletado()) {
+                clearInterval(timerInterval);
+                let endTime = Date.now();
+                let totalTime = Math.round((endTime - startTime) / 1000);
+                alert(`¡Felicidades! Has completado el puzzle en ${totalTime} segundos.`);
+                guardarResultado(totalTime);
+            }
+        }
+    }
+
+    function esAdyacente(index1, index2, size) {
+        let row1 = Math.floor(index1 / size);
+        let col1 = index1 % size;
+        let row2 = Math.floor(index2 / size);
+        let col2 = index2 % size;
+
+        return (Math.abs(row1 - row2) + Math.abs(col1 - col2)) === 1;
+    }
+
+    function intercambiarPiezas(piece1, piece2) {
+        let temp = piece1.textContent;
+        piece1.textContent = piece2.textContent;
+        piece2.textContent = temp;
+
+        piece1.classList.toggle('empty');
+        piece2.classList.toggle('empty');
+    }
+
+    function puzzleCompletado() {
+        // Verificar si todas las piezas están en orden
+        for (let i = 0; i < piezas.length - 1; i++) {
+            if (piezas[i].textContent !== (i + 1).toString()) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    function guardarResultado(totalTime) {
+        let form = document.createElement('form');
+        form.method = 'POST';
+        form.action = '/guardarRating';
+
+        let inputTiempo = document.createElement('input');
+        inputTiempo.type = 'hidden';
+        inputTiempo.name = 'time';
+        inputTiempo.value = totalTime;
+
+        form.appendChild(inputTiempo);
+        document.body.appendChild(form);
+
+        form.submit();
+    }
+
+    // Inicializar el puzzle cuando la página cargue
+    window.onload = function () {
+        let tamanio = puzzleContainer.getAttribute('data-tamanio');
+        generarPuzzle(tamanio);
+    };
+</script>
+</body>
+</html>

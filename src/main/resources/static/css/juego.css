@@ -1,0 +1,217 @@
+/* Reset general */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* Estilos generales del body */
+body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100vh;
+    background: linear-gradient(120deg, #3a4aef 0%, #24b0e8 100%);
+    color: white; /* Color del texto por defecto */
+    font-family: 'Arial', sans-serif;
+}
+
+/* Estilo del título */
+h1 {
+    font-size: 36px;
+    margin-bottom: 20px;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+/* Estilo del contenedor del puzzle */
+#puzzle {
+    display: grid;
+    gap: 5px; /* Espaciado entre las piezas */
+    border: 4px solid rgba(255, 255, 255, 0.8); /* Borde del contenedor con mayor transparencia */
+    border-radius: 10px; /* Esquinas redondeadas */
+    padding: 5px; /* Espacio interno del contenedor */
+    background-color: rgba(255, 255, 255, 0.1); /* Fondo semitransparente para el contenedor */
+    width: 500px; /* Ancho fijo para el contenedor */
+    height: 500px; /* Altura fija para el contenedor */
+}
+
+/* Estilo de las piezas del puzzle */
+.piece {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: rgba(153, 169, 255, 0.8); /* Color de fondo para las piezas */
+    border: 2px solid #ffffff; /* Bordes de las piezas */
+    border-radius: 5px; /* Esquinas redondeadas */
+    font-size: 32px; /* Tamaño del texto aumentado */
+    color: #ffffff; /* Color del texto de las piezas */
+    transition: transform 0.2s ease, background-color 0.2s ease; /* Transición al hacer hover */
+    cursor: pointer; /* Cambiar cursor al pasar sobre la pieza */
+    width: 100%; /* Ancho de la pieza al 100% del contenedor */
+    height: 100%; /* Altura de la pieza al 100% del contenedor */
+}
+
+/* Efecto hover para las piezas */
+.piece:hover {
+    color: #6275fb;
+    transform: scale(1.05); /* Aumentar ligeramente el tamaño al pasar el mouse */
+    background-color: rgba(255, 255, 255, 0.5); /* Cambiar color de fondo al hacer hover */
+}
+
+/* Pieza vacía */
+.empty {
+    background-color: transparent; /* Color de la pieza vacía */
+}
+
+/* Estilo para el temporizador y el jugador */
+p {
+    font-size: 18px;
+    margin: 10px 0;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+/* Estilo del botón de guardar resultado */
+button {
+    margin-top: 20px;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    background-color: #2bf41d; /* Color de fondo del botón */
+    color: white; /* Color del texto del botón */
+    font-weight: bold;
+    font-size: 18px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease; /* Transiciones para el botón */
+}
+
+button:hover {
+    background-color: #29b716; /* Cambio de color al pasar el mouse */
+    transform: scale(1.05); /* Aumentar ligeramente el tamaño al hacer hover */
+}
+
+/* Estilo de la alerta de finalización del puzzle */
+.alert {
+    position: fixed;
+    top: 20%;
+    left: 50%;
+    transform: translate(-50%, -20%);
+    background-color: rgba(0, 0, 0, 0.7);
+    color: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+}
+
+
+
+#jugador-info {
+    background-color: #fff;
+
+}
+
+.wrapper__option__puzzle {
+    max-width: 400px;
+    width: 350px;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+
+    gap: 20px;
+    z-index: 2;
+    justify-content: center;
+}
+
+.wrapper__option__puzzle .content__infor {
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    background-color: #fff;
+    border-radius: 12px;
+}
+
+.wrapper__option__puzzle .infomation__player {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    color: #2c95ef;
+}
+
+.infomation__player div {
+    justify-content: center;
+    align-items: center;
+}
+
+.icon {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    height: auto;
+}
+
+.icon img {
+    object-fit: cover;
+    width: 100px;
+    height: 100px;
+}
+
+.icon h1 {
+    font-size: 20px;
+    color: #000;
+}
+.status__player {
+    color: #000;
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.status {
+    width: 15px;
+    height: 15px;
+    border-radius: 50%;
+    margin-right: 10px;
+}
+
+.status.active {
+    padding: 5px;
+    background-color: #00ff00;
+    box-shadow: 0 0 5px #00ff00, 0 0 10px #00ff00, 0 0 15px #00ff00, 0 0 20px #00ff00, 0 0 30px #00ff00;
+    border-radius: 5px;
+    color: #fff;
+}
+
+.status.inactive {
+    padding: 5px;
+    background-color: gray;
+    box-shadow: 0 0 5px gray, 0 0 20px gray, 0 0 30px gray, 0 0 40px gray, 0 0 50px gray;
+    border-radius: 5px;
+    color: #fff;
+}
+
+.leave__btn {
+    gap: 10px;
+    margin-top: 20px;
+    background-color: #e10e0e;
+    padding: 10px;
+    color: #fff;
+    font-weight: 600;
+    font-size: 20px;
+    width: 100%;
+    border-radius: 12px;
+    text-decoration: none;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.container__puzzle {
+    background-color: #fff;
+    border-radius: 12px;
+
+}
+
+
+

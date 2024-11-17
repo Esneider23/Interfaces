@@ -1,0 +1,37 @@
+version: '3.8'
+
+services:
+  # Servicio para la aplicación Java
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: java-app
+    ports:
+      - "8080:8080"  # Mapea el puerto 8080 del contenedor al puerto 8080 de la máquina local
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql-db:3306/puzzle?createDatabaseIfNotExist=true
+      - SPRING_DATASOURCE_USERNAME=root
+      - SPRING_DATASOURCE_PASSWORD=root
+      - SPRING_JPA_HIBERNATE_DDL_AUTO=update  # Permite que Hibernate actualice el esquema
+    depends_on:
+      - db  # Asegura que la app espere a que el contenedor db esté listo
+    networks:
+      - mynetwork
+
+  # Servicio para la base de datos MySQL
+  db:
+    image: mysql:8.0
+    container_name: mysql-db
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: root
+    ports:
+      - "3307:3306"
+    networks:
+      - mynetwork
+
+# Definir redes personalizadas para comunicación entre los contenedores
+networks:
+  mynetwork:
+    driver: bridge
