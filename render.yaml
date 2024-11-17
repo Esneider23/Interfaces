@@ -1,30 +1,35 @@
 services:
+  # Servicio para la aplicación Java
   - type: web
     name: java-app
-    env: java
-    buildCommand: ./mvnw clean package  # Si usas Maven, este es el comando adecuado
-    startCommand: java -jar target/myapp.jar  # Asegúrate de que este sea el nombre correcto del archivo .jar
+    env: docker
+    build:
+      dockerfilePath: Dockerfile  # Especifica el Dockerfile para construir tu aplicación Java
+      context: .  # Contexto del Dockerfile (directorio raíz del proyecto)
+    startCommand: java -jar /app/myapp.jar  # Cambia esto según la ruta del JAR en tu Dockerfile
     plan: free
     regions:
-      - oregon  # Escoge la región más cercana
+      - oregon
     ports:
-      - 8080  # Expone el puerto 8080
+      - 8080  # Puerto expuesto por la aplicación
     environment:
       SPRING_DATASOURCE_URL: jdbc:mysql://mysql-db:3306/puzzle?createDatabaseIfNotExist=true
       SPRING_DATASOURCE_USERNAME: root
       SPRING_DATASOURCE_PASSWORD: root
-      SPRING_JPA_HIBERNATE_DDL_AUTO: update  # Configuración de Hibernate
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
     dependsOn:
-      - mysql-db  # Asegura que la base de datos esté lista antes de iniciar la app
+      - mysql-db  # Dependencia del servicio de base de datos
 
-  - type: database
+  # Servicio para la base de datos MySQL
+  - type: docker
     name: mysql-db
-    env: mysql
+    env: docker
+    image: mysql:8.0  # Imagen oficial de MySQL
     plan: free
-    region: oregon  # Región para la base de datos MySQL
-    databaseUrl: mysql://root:root@mysql-db:3306/puzzle  # URL de conexión a la base de datos
-    environment:
-      MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: puzzle
+    regions:
+      - oregon
     ports:
-      - 3307:3306  # Exposición del puerto de la base de datos
+      - 3306  # Puerto que el contenedor MySQL expondrá internamente
+    environment:
+      MYSQL_ROOT_PASSWORD: root  # Contraseña del usuario root
+      MYSQL_DATABASE: puzzle  # Base de datos inicial que será creada
