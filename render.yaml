@@ -2,30 +2,29 @@ services:
   - type: web
     name: java-app
     env: java
-    buildCommand: ./mvnw clean package  # Usar el comando adecuado para tu app Java
-    startCommand: java -jar target/myapp.jar  # Cambia el nombre del archivo .jar según corresponda
+    buildCommand: ./mvnw clean package  # Si usas Maven, este es el comando adecuado
+    startCommand: java -jar target/myapp.jar  # Asegúrate de que este sea el nombre correcto del archivo .jar
     plan: free
     regions:
       - oregon  # Escoge la región más cercana
     ports:
-      - 8080  # El puerto expuesto
+      - 8080  # Expone el puerto 8080
     environment:
       SPRING_DATASOURCE_URL: jdbc:mysql://mysql-db:3306/puzzle?createDatabaseIfNotExist=true
       SPRING_DATASOURCE_USERNAME: root
       SPRING_DATASOURCE_PASSWORD: root
-      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update  # Configuración de Hibernate
     dependsOn:
-      - mysql-db  # Asegura que el servicio de base de datos esté listo antes de iniciar
+      - mysql-db  # Asegura que la base de datos esté lista antes de iniciar la app
 
   - type: db
     name: mysql-db
     env: mysql
     plan: free
-    region: oregon
-    databaseUrl: mysql://root:root@mysql-db:3306/puzzle
+    region: oregon  # Región para la base de datos MySQL
+    databaseUrl: mysql://root:root@mysql-db:3306/puzzle  # URL de conexión a la base de datos
     environment:
       MYSQL_ROOT_PASSWORD: root
       MYSQL_DATABASE: puzzle
-    region: oregon
     ports:
-      - 3307:3306  # Asegura que el puerto de MySQL esté accesible
+      - 3307:3306  # Exposición del puerto de la base de datos
