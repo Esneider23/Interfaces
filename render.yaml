@@ -17,7 +17,7 @@ services:
     dependsOn:
       - mysql-db  # Asegura que la base de datos esté lista antes de iniciar la app
 
-  - type: db
+  - type: database
     name: mysql-db
     env: mysql
     plan: free
