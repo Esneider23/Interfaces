@@ -1,35 +1,13 @@
 services:
-  # Servicio para la aplicación Java
   - type: web
     name: java-app
     env: docker
     build:
-      dockerfilePath: Dockerfile  # Especifica el Dockerfile para construir tu aplicación Java
+      dockerfilePath: docker-compose.yaml  # Especifica el Dockerfile para construir tu aplicación Java
       context: .  # Contexto del Dockerfile (directorio raíz del proyecto)
-    startCommand: java -jar /app/myapp.jar  # Cambia esto según la ruta del JAR en tu Dockerfile
+    startCommand: docker-compose up --build # Cambia esto según la ruta del JAR en tu Dockerfile
     plan: free
     regions:
       - oregon
     ports:
       - 8080  # Puerto expuesto por la aplicación
-    environment:
-      SPRING_DATASOURCE_URL: jdbc:mysql://mysql-db:3306/puzzle?createDatabaseIfNotExist=true
-      SPRING_DATASOURCE_USERNAME: root
-      SPRING_DATASOURCE_PASSWORD: root
-      SPRING_JPA_HIBERNATE_DDL_AUTO: update
-    dependsOn:
-      - mysql-db  # Dependencia del servicio de base de datos
-
-  # Servicio para la base de datos MySQL
-  - type: docker
-    name: mysql-db
-    env: docker
-    image: mysql:8.0  # Imagen oficial de MySQL
-    plan: free
-    regions:
-      - oregon
-    ports:
-      - 3306  # Puerto que el contenedor MySQL expondrá internamente
-    environment:
-      MYSQL_ROOT_PASSWORD: root  # Contraseña del usuario root
-      MYSQL_DATABASE: puzzle  # Base de datos inicial que será creada
