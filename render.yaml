@@ -1,13 +1,10 @@
 services:
   - type: web
     name: java-app
-    env: docker
-    build:
-      dockerfilePath: docker-compose.yaml  # Especifica el Dockerfile para construir tu aplicación Java
-      context: .  # Contexto del Dockerfile (directorio raíz del proyecto)
-    startCommand: docker-compose up --build # Cambia esto según la ruta del JAR en tu Dockerfile
+    dockerfilePath: Dockerfile
+    dockerCommand: docker-compose up --build # Cambia esto según la ruta del JAR en tu Dockerfile
     plan: free
-    regions:
-      - oregon
-    ports:
-      - 8080  # Puerto expuesto por la aplicación
+    region: oregon
+    envVars:
+      - key: PORT
+        value: 8080
