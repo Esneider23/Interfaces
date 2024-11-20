@@ -2,7 +2,7 @@ services:
   - type: web
     runtime: docker
     name: java-app
-    dockerfilePath: Dockerfile
+    dockerfilePath: docker-compose.yaml
     dockerCommand: docker-compose up --build
     plan: free
     region: oregon
