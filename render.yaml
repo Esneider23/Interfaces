@@ -1,5 +1,6 @@
 services:
-  - type: docker
+  - type: web
+    runtime: docker
     name: java-app
     dockerfilePath: Dockerfile
     dockerCommand: docker-compose up --build
