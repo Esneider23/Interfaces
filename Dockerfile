@@ -1,30 +1,8 @@
-# Usa una imagen base con OpenJDK
-FROM openjdk:21-jdk-slim AS build
+# Fase 1: Imagen base para ejecutar la aplicación
+FROM openjdk:21-jdk-alpine
 
-# Instalar Maven
-RUN apt-get update && apt-get install -y maven
+# Copiar el archivo .jar desde la carpeta local al contenedor
+COPY /target/puzzle-0.0.1-SNAPSHOT.jar puzzle-0.0.1-SNAPSHOT.jar
 
-# Establecer el directorio de trabajo
-WORKDIR /app
-
-# Copiar el archivo pom.xml y el código fuente
-COPY pom.xml . 
-COPY src ./src
-
-# Ejecutar Maven para compilar el proyecto
-RUN mvn clean install -DskipTests
-
-# Usar una imagen base para ejecutar el contenedor de la aplicación
-FROM openjdk:21-jdk-slim
-
-# Establecer el directorio de trabajo en el contenedor de ejecución
-WORKDIR /app
-
-# Copiar el archivo .jar desde la fase de construcción
-COPY --from=build /app/target/*.jar app.jar
-
-# Exponer el puerto en el que la aplicación escucha
-EXPOSE 8080
-
-# Comando para ejecutar la aplicación
-CMD ["java", "-jar", "app.jar"]
+# Comando para ejecutar el archivo .jar
+ENTRYPOINT [ "java", "-jar", "puzzle-0.0.1-SNAPSHOT.jar" ] 

@@ -38,7 +38,6 @@ public class GameController {
         }
 
         model.addAttribute("ratings", ratingService.findBestTimesForAllPlayers());
-
         return "inicio";
     }
 
